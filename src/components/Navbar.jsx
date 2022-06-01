@@ -3,15 +3,16 @@ import { Link } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./../firebaseConfig";
 import { signOut } from "firebase/auth";
+import AddArticle from "./AddArticle";
 
 export default function Navbar() {
 	const [user] = useAuthState(auth);
 	return (
-		<div className="fixed-top border" style={{ backgroundColor: "whitesmoke" }}>
+		<div className="border" style={{ backgroundColor: "whitesmoke" }}>
 			<nav className="navbar">
 				<div>
 					<img
-						src="logo.png"
+						src="logo192.png"
 						width={30}
 						height={30}
 						alt="logo"
@@ -19,13 +20,16 @@ export default function Navbar() {
 					/>
 				</div>
 				<Link className="nav-link" to="/">
-					Home{" "}
+					Головна сторінка{" "}
+				</Link>
+				<Link className="nav-link" to="/addarticle">
+					Створити оголошення{" "}
 				</Link>
 				<div>
 					{user && (
 						<>
 							<span className="pe-4">
-								Signed is as {user.displayName || user.email}
+								Ви увійшли як {user.displayName || user.email}
 							</span>
 							<button
 								className="btn btn-primary btn-sm me-3"
@@ -33,7 +37,7 @@ export default function Navbar() {
 									signOut(auth);
 								}}
 							>
-								Logout
+								Вийти
 							</button>
 						</>
 					)}
