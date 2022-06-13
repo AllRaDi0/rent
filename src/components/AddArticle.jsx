@@ -13,21 +13,69 @@ export default function AddArticle() {
 		category: "",
 		price: "",
 		pledge: "",
-		address: "",
+		country: "",
+		city: "",
+		region: "",
+		street: "",
+		houseNumber: "",
+		zip: "",
 		phone: "",
 		description: "",
 		image: "",
+		typeOfDrill: "",
+		typeOfPower: "",
+		drillDiameter: "",
+		weight: "",
+		turns: "",
+		power: "",
 		createdAt: Timestamp.now().toDate(),
 	});
+
+	const {
+		title,
+		category,
+		price,
+		pledge,
+		country,
+		city,
+		region,
+		street,
+		houseNumber,
+		zip,
+		phone,
+		description,
+		image,
+		typeOfDrill,
+		typeOfPower,
+		drillDiameter,
+		weight,
+		turns,
+		power,
+	} = formData;
 
 	const [progress, setProgress] = useState(0);
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+
+	const handleChangeOnlyLetters = (e) => {
+		const re = /[а-яієїґ\']+/gi;
+
+		if (e.target.value === "" || re.test(e.target.value)) {
+			setFormData({ ...formData, [e.target.name]: e.target.value });
+		}
+	};
+
+	const handleChangeOnlyNumbers = (e) => {
+		const re = /[0-9]/;
+		if (e.target.value === "" || re.test(e.target.value)) {
+			setFormData({ ...formData, [e.target.name]: e.target.value });
+		}
+	};
+
 	const handleChangeSelect = (e) => {
-		console.log(e.target.value);
-		setFormData({ ...formData, [formData.category]: e.value });
+		setFormData({ ...formData, category: e.target.value });
 	};
 
 	const handleImageChange = (e) => {
@@ -36,25 +84,27 @@ export default function AddArticle() {
 
 	const handlePublish = () => {
 		if (
-			!formData.title ||
-			!formData.category ||
-			!formData.description ||
-			!formData.price ||
-			!formData.pledge ||
-			!formData.address ||
-			!formData.phone ||
-			!formData.image
+			!title ||
+			!country ||
+			!region ||
+			!city ||
+			!street ||
+			!houseNumber ||
+			zip.length < 5 ||
+			!description ||
+			!price ||
+			!pledge ||
+			!category ||
+			phone.length < 10 ||
+			!image
 		) {
 			alert("Please fill all the fields");
 			return;
 		}
 
-		const storageRef = ref(
-			storage,
-			`/images/${Date.now()}${formData.image.name}`
-		);
+		const storageRef = ref(storage, `/images/${Date.now()}${image.name}`);
 
-		const uploadImage = uploadBytesResumable(storageRef, formData.image);
+		const uploadImage = uploadBytesResumable(storageRef, image);
 
 		uploadImage.on(
 			"state_changed",
@@ -73,22 +123,44 @@ export default function AddArticle() {
 					category: "",
 					price: "",
 					pledge: "",
-					address: "",
+					country: "",
+					region: "",
+					city: "",
+					street: "",
+					houseNumber: "",
+					zip: "",
 					phone: "",
 					description: "",
 					image: "",
+					typeOfDrill: "",
+					typeOfPower: "",
+					drillDiameter: "",
+					weight: "",
+					turns: "",
+					power: "",
 				});
 
 				getDownloadURL(uploadImage.snapshot.ref).then((url) => {
 					const articleRef = collection(db, "Articles");
 					addDoc(articleRef, {
-						title: formData.title,
-						category: formData.category,
-						description: formData.description,
-						price: formData.price,
-						pledge: formData.pledge,
-						address: formData.address,
-						phone: formData.phone,
+						title,
+						category,
+						description,
+						price,
+						pledge,
+						country,
+						region,
+						city,
+						street,
+						houseNumber,
+						zip,
+						phone,
+						typeOfDrill,
+						typeOfPower,
+						drillDiameter,
+						weight,
+						turns,
+						power,
 						imageUrl: url,
 						createdAt: Timestamp.now().toDate(),
 						createdBy: user.displayName,
@@ -126,69 +198,254 @@ export default function AddArticle() {
 							type="text"
 							name="title"
 							className="form-control"
-							value={formData.title}
+							value={title}
 							onChange={(e) => handleChange(e)}
 						/>
 					</div>
 
 					{/* category */}
-					<label htmlFor="">Категорія</label>
+					<div>
+						<label htmlFor="">Категорія</label>
+						{/* <select onChange={handleChangeSelect}>
+							{categoryOption.map((option, index) => (
+								<option value={option || ""} key={index}>
+									{option}
+								</option>
+							))}
+						</select> */}
 
-					<input
-						className="form-control"
-						type="text"
-						list="category"
-						name="category"
-						autoSave="off"
-						onChange={(e) => handleChange(e)}
-					/>
+						<select
+							className="form-select"
+							onChange={handleChangeSelect}
+							value={category}
+						>
+							<option disabled value="">
+								Оберіть категорію
+							</option>
+							<option value="Дрелі">Дрелі</option>
+							<option value="Відбійні молотки">Відбійні молотки</option>
+							<option value="Перфоратори">Перфоратори</option>
+						</select>
+					</div>
 
-					<datalist id="category">
-						<option value="Дрелі" />
-						<option value="Відбійні молотки" />
-						<option value="Перфоратори" />
-					</datalist>
+					{category === "Дрелі" && (
+						<div className="row">
+							<div className="col">
+								<div>
+									<label htmlFor="">Прилад</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({ ...formData, typeOfDrill: e.target.value })
+										}
+										value={typeOfDrill}
+									>
+										<option disabled value=""></option>
+										<option value="Магнитна дрель">Магнитна дріль</option>
+										<option value="Кутова дрель">Кутова дрель</option>
+										<option value="Ударна дрель">Ударна дрель</option>
+										<option value="Безударна дрель">Безударна дрель</option>
+									</select>
+								</div>
+								<div>
+									<label htmlFor="">Потужність</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({ ...formData, power: e.target.value })
+										}
+										value={power}
+									>
+										<option disabled value=""></option>
+										<option value="1001-1250 Вт">1001-1250 Вт</option>
+										<option value="1251-1500 Вт">1251-1500 Вт</option>
+										<option value="1501-2000 Вт">1501-2000 Вт</option>
+									</select>
+								</div>
+							</div>
+							<div className="col">
+								<div>
+									<label htmlFor="">Живлення</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({ ...formData, typeOfPower: e.target.value })
+										}
+										value={typeOfPower}
+									>
+										<option disabled value=""></option>
+										<option value="Акумуляторні">Акумуляторні</option>
+										<option value="Пневмо">Пневмо</option>
+										<option value="Мережа">Мережа</option>
+									</select>
+								</div>
+
+								<div>
+									<label htmlFor="">Обороти</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({ ...formData, turns: e.target.value })
+										}
+										value={turns}
+									>
+										<option disabled value=""></option>
+										<option value="1001-1500 Об/хв">1001-1500 Об/хв</option>
+										<option value="1501-2000 Об/хв">15001-2000 Об/хв</option>
+										<option value="2001-3000 Об/хв">2001-3000 Об/хв</option>
+									</select>
+								</div>
+							</div>
+							<div className="col">
+								<div>
+									<label htmlFor="">Діаметр свердла</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												drillDiameter: e.target.value,
+											})
+										}
+										value={drillDiameter}
+									>
+										<option disabled value=""></option>
+										<option value="10 мм">10 мм</option>
+										<option value="20 мм">20 мм</option>
+										<option value="30 мм">30 мм</option>
+									</select>
+								</div>
+
+								<div>
+									<label htmlFor="">Вага</label>
+									<select
+										className="form-select"
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												weight: e.target.value,
+											})
+										}
+										value={weight}
+									>
+										<option disabled value=""></option>
+										<option value="0.6-1 кг">0.6-1 кг</option>
+										<option value="1.1-1.5 кг">1.1-1.5 кг</option>
+										<option value="1.6-2 кг">1.6-2 кг</option>
+									</select>
+								</div>
+							</div>
+							<div className="form-text">
+								Користувачі часто вибирають параметри для точного пошуку. Чим
+								докладніше опис, тим більші шанси, що ваше оголошення помітять.
+							</div>
+						</div>
+					)}
 
 					{/* description */}
 					<label htmlFor="">Опис</label>
 					<textarea
 						name="description"
 						className="form-control"
-						value={formData.description}
+						value={description}
 						onChange={(e) => handleChange(e)}
 					/>
 
-					{/* price */}
-					<label htmlFor="">Ціна за день</label>
-					<input
-						type="number"
-						name="price"
-						min={1}
-						className="form-control"
-						value={formData.price}
-						onChange={(e) => handleChange(e)}
-					/>
+					<div className="row">
+						<div className="col">
+							{/* price */}
+							<label htmlFor="">Ціна за день</label>
+							<input
+								type="number"
+								name="price"
+								min={1}
+								className="form-control"
+								value={price}
+								onChange={(e) => handleChange(e)}
+							/>
+						</div>
+						<div className="col">
+							{/* pledge */}
+							<label htmlFor="">Застава</label>
+							<input
+								type="number"
+								name="pledge"
+								min={0}
+								className="form-control"
+								value={pledge}
+								onChange={(e) => handleChange(e)}
+							/>
+						</div>
+					</div>
 
-					{/* pledge */}
-					<label htmlFor="">Застава</label>
-					<input
-						type="number"
-						name="pledge"
-						min={1}
-						className="form-control"
-						value={formData.pledge}
-						onChange={(e) => handleChange(e)}
-					/>
+					<div className="row">
+						<div className="col">
+							{/* Country */}
+							<label htmlFor="">Країна</label>
+							<input
+								type="text"
+								name="country"
+								className="form-control"
+								value={country}
+								onChange={(e) => handleChangeOnlyLetters(e)}
+							/>
 
-					{/* address */}
-					<label htmlFor="">Адреса</label>
-					<input
-						type="text"
-						name="address"
-						className="form-control"
-						value={formData.address}
-						onChange={(e) => handleChange(e)}
-					/>
+							{/* Region */}
+							<label htmlFor="">Область</label>
+							<input
+								type="text"
+								name="region"
+								className="form-control"
+								value={region}
+								onChange={(e) => handleChangeOnlyLetters(e)}
+							/>
+
+							{/* City */}
+							<label htmlFor="">Місто</label>
+							<input
+								type="text"
+								name="city"
+								className="form-control"
+								value={city}
+								onChange={(e) => handleChangeOnlyLetters(e)}
+							/>
+						</div>
+						<div className="col">
+							{/* Street */}
+							<label htmlFor="">Вулиця</label>
+							<input
+								type="text"
+								name="street"
+								className="form-control"
+								value={street}
+								onChange={(e) => handleChangeOnlyLetters(e)}
+							/>
+
+							{/* House number */}
+							<label htmlFor="">Номер будинку</label>
+							<input
+								type="number"
+								name="houseNumber"
+								className="form-control"
+								value={houseNumber}
+								onChange={(e) => handleChange(e)}
+							/>
+
+							{/* ZIP */}
+							<label htmlFor="">ZIP код</label>
+							<input
+								type="text"
+								name="zip"
+								className="form-control"
+								value={zip}
+								maxLength={5}
+								onChange={(e) => handleChangeOnlyNumbers(e)}
+								required
+							/>
+						</div>
+					</div>
+
+					<div className="form-text">Довжина коду повинна бути 5 символів</div>
 
 					{/* phone */}
 					<label htmlFor="">Номер телефону</label>
@@ -196,10 +453,12 @@ export default function AddArticle() {
 						type="tel"
 						name="phone"
 						className="form-control"
-						value={formData.phone}
-						maxLength="10"
+						value={phone}
+						maxLength="12"
 						onChange={(e) => handleChange(e)}
 					/>
+
+					<div className="form-text">Введіть номер у форматі: 380XXXXXXXXX</div>
 
 					{/* image */}
 					<label htmlFor="">Фотографія</label>

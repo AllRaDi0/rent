@@ -23,7 +23,10 @@ export default function Article() {
 				<div className="row">
 					<div className="col-8 mt-3">
 						<h2>{article.title}</h2>
-						<div>{article.address}</div>
+						<div>
+							{article.country}, {article.region} область, {article.city},{" "}
+							{article.street}, {article.houseNumber}, {article.zip}
+						</div>
 						<img
 							src={article.imageUrl}
 							alt={article.title}
@@ -34,7 +37,56 @@ export default function Article() {
 							Дата створення: {article.createdAt.toDate().toDateString()}
 						</div>
 						<hr />
-						<h4>{article.description}</h4>
+
+						<div style={{ whiteSpace: "pre-wrap", overflowWrap: "break-word" }}>
+							<h4>Опис</h4>
+							<p className="h5">{article.description}</p>
+						</div>
+
+						{article.typeOfDrill ||
+							article.typeOfPower ||
+							article.drillDiameter ||
+							article.weight ||
+							article.turns ||
+							(article.power && (
+								<div>
+									<hr />
+									<h4>Характеристики</h4>
+									<table className="table">
+										<thead>
+											<tr>
+												{article.typeOfDrill && <th scope="col">Прилад</th>}
+												{article.typeOfPower && <th scope="col">Живлення</th>}
+												{article.drillDiameter && (
+													<th scope="col">Діаметр свердла</th>
+												)}
+												{article.weight && <th scope="col">Вага</th>}
+												{article.turns && <th scope="col">Обороти</th>}
+												{article.power && <th scope="col">Потужність</th>}
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												{article.typeOfDrill && (
+													<th scope="col">{article.typeOfDrill}</th>
+												)}
+												{article.typeOfPower && (
+													<th scope="col">{article.typeOfPower}</th>
+												)}
+												{article.drillDiameter && (
+													<th scope="col">{article.drillDiameter}</th>
+												)}
+												{article.weight && (
+													<th scope="col">{article.weight}</th>
+												)}
+												{article.turns && <th scope="col">{article.turns}</th>}
+												{article.power && <th scope="col">{article.power}</th>}
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							))}
+
 						<div className="d-flex flex-row-reverse">
 							{user && <LikeArticle id={id} likes={article.likes} />}
 							<div className="pe-2">
@@ -44,6 +96,7 @@ export default function Article() {
 						{/* comment  */}
 						<Comment id={article.id} />
 					</div>
+
 					<div className="col-4 mt-3">
 						<div className="row">
 							<div className="col" style={{ paddingRight: 0 }}>
@@ -71,9 +124,9 @@ export default function Article() {
 							</h5>
 							<h6 className="text-center">
 								{" "}
-								<i className="fa fa-phone" /> +38{article.phone}
+								<i className="fa fa-phone" /> +{article.phone}
 							</h6>
-							<a href="#" class="btn btn-primary mt-5">
+							<a href="#" className="btn btn-primary mt-5">
 								Написати орендодавцю
 							</a>
 						</div>

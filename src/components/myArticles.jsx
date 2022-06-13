@@ -6,11 +6,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import LikeArticle from "./LikeArticle";
 import { Link } from "react-router-dom";
 
-export default function Articles() {
+function MyArticles() {
 	const [articles, setArticles] = useState([]);
-	const [searchValue, setSearchValue] = useState("");
 	const [user] = useAuthState(auth);
-
 	useEffect(() => {
 		const articleRef = collection(db, "Articles");
 		const q = query(articleRef, orderBy("createdAt", "desc"));
@@ -23,71 +21,13 @@ export default function Articles() {
 		});
 	}, []);
 
-	const handleSortByLikes = () => {
-		const sortList = [...articles].sort((a, b) => (a.likes < b.likes ? 1 : -1));
-		setArticles(sortList);
-	};
-
-	const handleSortByPriceToHigh = () => {
-		const sortList = [...articles].sort((a, b) =>
-			+a.price > +b.price ? 1 : -1
-		);
-		setArticles(sortList);
-	};
-
-	const handleSortByPriceToLow = () => {
-		const sortList = [...articles].sort((a, b) =>
-			+a.price < +b.price ? 1 : -1
-		);
-		setArticles(sortList);
-	};
-
 	return (
 		<div>
-			<input
-				className="form-control mb-3"
-				value={searchValue}
-				placeholder="Пошук за назвою, категоріями, орендодавцем, містом"
-				onChange={(e) => {
-					setSearchValue(e.target.value);
-				}}
-			></input>
-
-			<button className="btn btn-outline-primary" onClick={handleSortByLikes}>
-				За популярнісю
-			</button>
-			<button
-				className="btn btn-outline-primary"
-				style={{ marginLeft: 5, marginRight: 5 }}
-				onClick={handleSortByPriceToHigh}
-			>
-				Від дешевих до дорогих
-			</button>
-			<button
-				className="btn btn-outline-primary"
-				onClick={handleSortByPriceToLow}
-			>
-				Від дорогих до дешевих
-			</button>
-
 			{articles.length === 0 ? (
 				<p>Жодного оголошення не було знайдено</p>
 			) : (
 				articles
-					.filter((post) => {
-						if (searchValue === "") {
-							return post;
-						} else if (
-							post.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-							post.createdBy
-								.toLowerCase()
-								.includes(searchValue.toLowerCase()) ||
-							post.city.toLowerCase().includes(searchValue.toLowerCase()) ||
-							post.category.toLowerCase().includes(searchValue.toLowerCase())
-						) {
-							return post;
-						}
-					})
+					.filter((post) => post.userId === user.uid && post)
 					.map(
 						({
 							id,
@@ -171,3 +111,5 @@ export default function Articles() {
 		</div>
 	);
 }
+
+export default MyArticles;

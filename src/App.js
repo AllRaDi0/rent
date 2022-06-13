@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import Article from "./components/Article";
+import MyArticles from "./components/myArticles";
 function App() {
 	return (
 		<div className="container">
@@ -15,6 +16,7 @@ function App() {
 					<Route path="/signin" element={<Login />} />
 					<Route path="/addarticle" element={<AddArticle />} />
 					<Route path="/article/:id" element={<Article />} />
+					<Route path="/myArticles" element={<MyArticles />} />
 					<Route
 						path="/"
 						element={
